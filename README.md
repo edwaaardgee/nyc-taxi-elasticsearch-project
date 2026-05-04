@@ -33,8 +33,10 @@ https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
 Download the March 2026 Yellow Taxi Trip Records file.
 
 Expected file name:
-yellow_tripdata_2026-03.parquet
 
+```text
+yellow_tripdata_2026-03.parquet
+```
 ### Step 2: Download the Taxi Zone Shapefile
 
 On the same NYC TLC page, download the Taxi Zone Shapefile from the Taxi Zone Maps / Lookup Tables section.
@@ -49,7 +51,10 @@ Replace [yourname] with the username on your own computer.
 ### Step 3: Install Python Libraries
 
 Open Command Prompt or Terminal and run:
+
+```bash
 python -m pip install pandas pyarrow geopandas
+```
 
 ### Step 4: Prepare the Taxi Data
 
