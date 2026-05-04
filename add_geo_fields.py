@@ -3,11 +3,11 @@ import geopandas as gpd
 import os
 
 # Load cleaned taxi data
-taxi_file = r"C:\Users\[yourname]\Downloads\nyc_taxi_subset.csv"
+taxi_file = "nyc_taxi_subset.csv"
 df = pd.read_csv(taxi_file)
 
 # Load NYC taxi zone shapefile
-zones_file = r"C:\Users\[yourname]\Downloads\taxi_zones\taxi_zones.shp"
+zones_file = "taxi_zones/taxi_zones.shp"
 zones = gpd.read_file(zones_file)
 
 # Convert taxi zones into latitude/longitude center points
@@ -86,7 +86,7 @@ df["dropoff_location"] = (
 df = df.sample(n=100000, random_state=42)
 
 # Save geo-enhanced file
-output_file = r"C:\Users\[yourname]\Downloads\nyc_taxi_subset_with_geo.csv"
+output_file = "nyc_taxi_subset_with_geo.csv"
 df.to_csv(output_file, index=False)
 
 size_mb = os.path.getsize(output_file) / (1024 * 1024)
