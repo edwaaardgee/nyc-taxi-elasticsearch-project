@@ -1,526 +1,405 @@
-# NYC Taxi Trip Data Analysis Using Elasticsearch and Kibana
+# NYC Taxi Trip Data Analysis Using Elasticsearch, Kibana, and Machine Learning
 
 ## Project Overview
 
-This project analyzes NYC Yellow Taxi Trip Records using Elasticsearch, Kibana, and Python. The dataset was downloaded from the New York City Taxi and Limousine Commission. We cleaned and sampled the data, uploaded it into Elasticsearch, created Kibana visualizations, and built a geo-temporal map of taxi pickups.
+This project analyzes NYC Yellow Taxi trip data using Python, Elasticsearch, Kibana, and Kibana Machine Learning. The goal of the project is to clean and prepare a real-world transportation dataset, upload it into Elasticsearch, build visualizations in Kibana, create a geo-temporal map, and train a machine learning regression model to predict taxi fare amount.
 
-The goal of this project is to show how real-world transportation data can be processed, stored, visualized, and prepared for predictive analysis using Elasticsearch and Kibana.
+The project uses the March 2026 NYC Yellow Taxi Trip Records dataset from the NYC Taxi and Limousine Commission. Python was used to clean the original Parquet file, create smaller CSV subsets, add time-based fields, and add geographic fields using the NYC Taxi Zone Shapefile. Elasticsearch was used to store and index the data, while Kibana was used for dashboards, maps, and machine learning analysis.
 
-## Data Source
+## Full Tutorial
 
-NYC TLC Trip Record Data:  
+The complete step-by-step tutorial is included separately as:
+
+`CIS3200_Group6_Term_Project_Tutorial.pdf`
+
+The tutorial explains how to download the dataset, prepare the data, upload the files into Elasticsearch, create Kibana visualizations, build the geo-temporal map, and run the machine learning regression model.
+
+This README gives a project overview, workflow summary, key results, and reproduction outline.
+
+## Project Goals
+
+- Download and prepare NYC Yellow Taxi trip data
+- Clean and sample the original dataset using Python
+- Add pickup and drop-off geographic fields using the NYC Taxi Zone Shapefile
+- Upload cleaned datasets into Elasticsearch
+- Build Kibana visualizations and a dashboard
+- Create a geo-temporal pickup map using Kibana Maps
+- Build a machine learning regression model to predict taxi fare amount
+- Evaluate the model using R², MSE, RMSE, and feature importance/influencers
+
+## Tools and Technologies Used
+
+- Python
+- pandas
+- pyarrow
+- GeoPandas
+- Elasticsearch
+- Kibana
+- Kibana Data Visualizer
+- Kibana Lens
+- Kibana Maps
+- Kibana Machine Learning Data Frame Analytics
+- Elastic Cloud
+- NYC Taxi and Limousine Commission Dataset
+
+## Dataset
+
+The dataset used in this project is the NYC Yellow Taxi Trip Records dataset for March 2026.
+
+Dataset source:
+
 https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
 
-Dataset used:
-
-```text
-Yellow Taxi Trip Records, March 2026
-```
-
-Additional geographic data used:
-
-```text
-NYC Taxi Zone Shapefile
-```
-
-The taxi zone shapefile was used to convert pickup and dropoff location IDs into approximate geographic coordinates for the Kibana map.
-
-## Platform Specs
-
-- Platform: Elastic Cloud / Kibana
-- Operating System: Windows 11
-- Python Version: 3.13.13
-- Libraries: pandas, pyarrow, geopandas
-- Original dataset rows: 3,952,451
-- Cleaned subset: 150,000 rows, 12.8 MB
-- Geo subset: 100,000 rows, 28.2 MB
-- Elasticsearch indexes: `nyc_taxi`, `nyc_taxi_geo2`
-
-## Repository Files
-
-This repository includes:
-
-```text
-README.md
-prepare_taxi_data.py
-add_geo_fields.py
-```
-
-The Python files are used for data preparation:
-
-- `prepare_taxi_data.py` cleans and samples the original NYC taxi dataset.
-- `add_geo_fields.py` joins the taxi data with the NYC taxi zone shapefile and creates geo-point fields for Kibana Maps.
-
-## Important File Setup
-
-Before running the Python scripts, place these files in the same folder as the scripts:
+Files used:
 
 - `yellow_tripdata_2026-03.parquet`
-- The extracted `taxi_zones` folder
-
-Your project folder should look like this:
-
-```text
-nyc-taxi-elasticsearch-project-main/
-├── README.md
-├── prepare_taxi_data.py
-├── add_geo_fields.py
-├── yellow_tripdata_2026-03.parquet
-└── taxi_zones/
-    ├── taxi_zones.shp
-    ├── taxi_zones.dbf
-    ├── taxi_zones.shx
-    └── other shapefile files
-```
-
-The taxi zone shapefile must stay inside a folder named:
-
-```text
-taxi_zones
-```
-
-## How to Reproduce the Project
-
-### Step 1: Download the NYC Taxi Dataset
-
-Go to the NYC TLC Trip Record Data page:
-
-https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
-
-Download the March 2026 Yellow Taxi Trip Records file.
-
-Expected file name:
-
-```text
-yellow_tripdata_2026-03.parquet
-```
-
-Place this file in the same folder as the Python scripts.
-
-## Step 2: Download the Taxi Zone Shapefile
-
-On the same NYC TLC page, find the Taxi Zone Maps / Lookup Tables section.
-
-Download the Taxi Zone Shapefile.
-
-Extract the ZIP file and place the extracted folder inside the project folder.
-
-Expected shapefile path:
-
-```text
-taxi_zones/taxi_zones.shp
-```
-
-## Step 3: Install Python Libraries
-
-Open Command Prompt or PowerShell in the project folder and run:
-
-```bash
-python -m pip install pandas pyarrow geopandas
-```
-
-These libraries are used for:
-
-- `pandas`: loading, cleaning, and sampling the taxi dataset
-- `pyarrow`: reading the Parquet file format
-- `geopandas`: reading the taxi zone shapefile and creating location coordinates
-
-## Step 4: Prepare the Taxi Data
-
-Run the first Python script:
-
-```bash
-python prepare_taxi_data.py
-```
-
-This script does the following:
-
-1. Loads the original NYC Yellow Taxi Parquet file.
-2. Selects the columns needed for the project.
-3. Removes missing and invalid rows.
-4. Creates new time-based fields:
-   - `pickup_hour`
-   - `pickup_day`
-   - `trip_duration_minutes`
-5. Samples the data into a smaller CSV file for Elasticsearch.
-6. Saves the cleaned file as `nyc_taxi_subset.csv`.
-
-Expected output:
-
-```text
-Rows: 150000
-File size: 12.80 MB
-Saved file: nyc_taxi_subset.csv
-```
-
-After running this step, the project folder should include:
-
-```text
-nyc_taxi_subset.csv
-```
-
-## Step 5: Add Geo Fields for the Map
-
-Run the second Python script:
-
-```bash
-python add_geo_fields.py
-```
-
-This script does the following:
-
-1. Loads the cleaned taxi CSV file.
-2. Loads the NYC taxi zone shapefile.
-3. Matches `PULocationID` and `DOLocationID` with taxi zone information.
-4. Adds pickup and dropoff borough and zone names.
-5. Creates approximate latitude and longitude coordinates using taxi zone centroids.
-6. Creates geo-point fields for Kibana Maps:
-   - `pickup_location`
-   - `dropoff_location`
-7. Saves the geo-enhanced CSV file as `nyc_taxi_subset_with_geo.csv`.
-
-Expected output:
-
-```text
-Rows: 100000
-File size: 28.22 MB
-Saved file: nyc_taxi_subset_with_geo.csv
-```
-
-After running this step, the project folder should include:
-
-```text
-nyc_taxi_subset.csv
-nyc_taxi_subset_with_geo.csv
-```
-
-## Step 6: Upload the Cleaned Dataset to Elasticsearch
-
-Open Kibana.
-
-Go to:
-
-```text
-Machine Learning → Data Visualizer → Upload file
-```
-
-Upload:
-
-```text
-nyc_taxi_subset.csv
-```
-
-Create a new index named:
-
-```text
-nyc_taxi
-```
-
-Click Import.
-
-Expected result:
-
-Kibana should show that the index was created, the file was uploaded, and the documents are searchable.
-
-## Step 7: Upload the Geo Dataset to Elasticsearch
-
-Go back to:
-
-```text
-Machine Learning → Data Visualizer → Upload file
-```
-
-Upload:
-
-```text
-nyc_taxi_subset_with_geo.csv
-```
-
-Create a new index named:
-
-```text
-nyc_taxi_geo2
-```
-
-Before importing, open the Mappings tab.
-
-Make sure these fields are mapped as `geo_point`:
-
-```json
-"pickup_location": {
-  "type": "geo_point"
-},
-"dropoff_location": {
-  "type": "geo_point"
-}
-```
-
-Then click Import.
-
-Expected result:
-
-The index `nyc_taxi_geo2` should be created with `pickup_location` and `dropoff_location` available as geospatial fields for Kibana Maps.
-
-## Step 8: Set the Kibana Time Range
-
-In Kibana, set the time range to:
-
-```text
-March 1, 2026 → March 31, 2026
-```
-
-This time range is important because the dataset uses March 2026 taxi trip records.
-
-## Step 9: Create Kibana Visualizations
-
-Create the following visualizations in Kibana Lens.
-
-### Visualization 1: Trip Count by Pickup Hour
-
-Chart type:
-
-```text
-Bar chart
-```
-
-Configuration:
-
-- Horizontal axis: `pickup_hour`
-- Vertical axis: Count of records
-
-Save as:
-
-```text
-Trip Count by Pickup Hour
-```
-
-Purpose:
-
-This chart shows how taxi trip volume changes throughout the day.
-
-### Visualization 2: Average Fare by Pickup Hour
-
-Chart type:
-
-```text
-Line chart
-```
-
-Configuration:
-
-- Horizontal axis: `pickup_hour`
-- Vertical axis: Average of `fare_amount`
-
-Save as:
-
-```text
-Average Fare by Pickup Hour
-```
-
-Purpose:
-
-This chart shows how the average taxi fare changes by hour of day.
-
-### Visualization 3: Average Trip Distance by Pickup Hour
-
-Chart type:
-
-```text
-Line chart
-```
-
-Configuration:
-
-- Horizontal axis: `pickup_hour`
-- Vertical axis: Average of `trip_distance`
-
-Save as:
-
-```text
-Average Trip Distance by Pickup Hour
-```
-
-Purpose:
-
-This chart shows whether trips are shorter or longer depending on the pickup hour.
-
-### Visualization 4: Top Pickup Location IDs by Trip Count
-
-Chart type:
-
-```text
-Bar chart
-```
-
-Configuration:
-
-- Horizontal axis: Top 10 values of `PULocationID`
-- Vertical axis: Count of records
-
-Turn off the “Other” bucket if it appears.
-
-Save as:
-
-```text
-Top Pickup Location IDs by Trip Count
-```
-
-Purpose:
-
-This chart shows which pickup location IDs had the highest taxi activity.
-
-## Step 10: Create the Geo-Temporal Map
-
-Go to:
-
-```text
-Maps → Create map → Add layer
-```
-
-Choose:
-
-```text
-Documents
-```
-
-Use this data view:
-
-```text
-nyc_taxi_geo2
-```
-
-Choose this geospatial field:
-
-```text
-pickup_location
-```
-
-Set the time range to:
-
-```text
-March 2026
-```
-
-Save the map as:
-
-```text
-Geo-Temporal Map of NYC Taxi Pickups
-```
-
-Purpose:
-
-This map shows taxi pickup activity across New York City during March 2026. The map uses pickup zone centroid coordinates created from the NYC taxi zone shapefile.
-
-## Step 11: Create the Dashboard
-
-Create a Kibana dashboard named:
-
-```text
-NYC Taxi Analysis Dashboard
-```
-
-Add all saved visualizations:
-
-1. Trip Count by Pickup Hour
-2. Average Fare by Pickup Hour
-3. Average Trip Distance by Pickup Hour
-4. Top Pickup Location IDs by Trip Count
-5. Geo-Temporal Map of NYC Taxi Pickups
-
-The dashboard summarizes taxi activity by time, fare, distance, location ID, and geographic pickup patterns.
-
-## Machine Learning Plan
-
-The predictive analysis task is to predict taxi `fare_amount`.
-
-Model type:
-
-```text
-Regression
-```
-
-Target field:
-
-```text
-fare_amount
-```
-
-Input features:
-
-- `trip_distance`
-- `trip_duration_minutes`
-- `passenger_count`
-- `pickup_hour`
-- `pickup_day`
-- `PULocationID`
-- `DOLocationID`
-- `payment_type`
-- `pickup_borough`
-- `dropoff_borough`
-
-Expected strongest influencers:
-
-- Trip distance
-- Trip duration
-- Pickup and dropoff location
-
-Reason for using regression:
-
-Fare amount is a continuous numeric value, so regression is appropriate for predicting the expected fare based on trip features.
+- NYC Taxi Zone Shapefile
+
+Dataset details:
+
+| Item | Value |
+|---|---|
+| Dataset | NYC Yellow Taxi Trip Records |
+| Month | March 2026 |
+| Original Rows | 3,952,451 |
+| Original Columns | 20 |
+| Original File Size | Approximately 64.8 MB |
+| Cleaned CSV Subset | 150,000 rows |
+| Cleaned CSV Size | Approximately 12.8 MB |
+| Geo-Enhanced CSV Subset | 100,000 rows |
+| Geo-Enhanced CSV Size | Approximately 28.2 MB |
+
+## Hardware and Environment
+
+The project was completed using a personal Windows computer for local data preparation and Elastic Cloud/Kibana for indexing, visualization, and machine learning.
+
+| Item | Specification |
+|---|---|
+| Operating System | Windows 11 |
+| Processor | 12th Gen Intel(R) Core(TM) i7-12700K |
+| Memory | 32 GB RAM |
+| System Type | 64-bit operating system |
+| Python Version | Python 3.13.13 |
+| Cloud Platform | Elastic Cloud / Kibana |
+| Search Engine | Elasticsearch |
 
 ## Project Workflow
 
-```text
-NYC TLC Dataset
-→ Python Data Cleaning
-→ Sampled CSV Dataset
-→ Taxi Zone Shapefile Join
-→ Geo Fields Added
-→ Elasticsearch Indexes
-→ Kibana Visualizations
-→ Geo-Temporal Map
-→ Machine Learning Fare Prediction Plan
-```
-
-## Reproducibility Test
-
-The project workflow was tested from a clean folder. The scripts successfully recreated both CSV files:
+The project follows this general process:
 
 ```text
-python prepare_taxi_data.py
-```
+Download NYC Taxi Data
+        ↓
+Download Taxi Zone Shapefile
+        ↓
+Clean and Sample Data with Python
+        ↓
+Create Time-Based Fields
+        ↓
+Join Taxi Data with Taxi Zone Shapefile
+        ↓
+Create Geo Fields for Kibana Maps
+        ↓
+Upload CSV Files into Elasticsearch
+        ↓
+Create Kibana Visualizations
+        ↓
+Build Kibana Dashboard
+        ↓
+Create Geo-Temporal Map
+        ↓
+Train Machine Learning Regression Model
+        ↓
+Evaluate Accuracy and Feature Importance
+Elasticsearch Indexes Created
 
-Output:
+The following Elasticsearch indexes were created:
 
-```text
-Rows: 150000
-File size: 12.80 MB
-Saved file: nyc_taxi_subset.csv
-```
+Index Name	Purpose
+nyc_taxi	Stores the cleaned taxi trip dataset
+nyc_taxi_geo	Stores the geo-enhanced taxi dataset
+nyc_taxi_fare_prediction	Stores the machine learning regression prediction results
+Python Data Preparation
 
-Then:
+The first Python script cleans the original taxi dataset and creates a smaller CSV file for Elasticsearch.
 
-```text
-python add_geo_fields.py
-```
+Main cleaning steps:
 
-Output:
+Load the original Parquet file
+Keep only the columns needed for analysis
+Remove missing values
+Remove invalid trips with zero or negative distance
+Remove invalid fare and total amount records
+Create pickup_hour
+Create pickup_day
+Create trip_duration_minutes
+Remove unrealistic trip durations
+Save a cleaned CSV subset
 
-```text
-Rows: 100000
-File size: 28.22 MB
-Saved file: nyc_taxi_subset_with_geo.csv
-```
+Output file:
 
-This confirms that the GitHub instructions can be followed to recreate the project files.
+nyc_taxi_subset.csv
+Geo-Enhanced Dataset
 
-## References
+The second Python script adds geographic fields to the taxi data by using the NYC Taxi Zone Shapefile.
 
-1. NYC Taxi & Limousine Commission Trip Record Data:  
-   https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
+Main geo-processing steps:
 
-2. Elasticsearch Documentation:  
-   https://www.elastic.co/docs
+Load nyc_taxi_subset.csv
+Load the NYC Taxi Zone Shapefile
+Convert taxi zone polygons into centroid points
+Join pickup location IDs with taxi zone data
+Join drop-off location IDs with taxi zone data
+Add pickup and drop-off latitude/longitude
+Add pickup and drop-off zone names
+Add pickup and drop-off borough names
+Create pickup_location and dropoff_location geo-point fields
+Save the geo-enhanced CSV file
 
-3. Kibana Documentation:  
-   https://www.elastic.co/docs
+Output file:
+
+nyc_taxi_subset_with_geo.csv
+Kibana Visualizations
+
+The project includes four main Kibana Lens visualizations.
+
+1. Trip Count by Pickup Hour
+
+This visualization shows taxi demand by hour of the day.
+
+Insight:
+
+Taxi demand increases after the morning hours and peaks later in the day.
+
+2. Average Fare by Pickup Hour
+
+This visualization shows how average taxi fare changes by pickup hour.
+
+Insight:
+
+Average fare spikes around early morning hours.
+
+3. Average Trip Distance by Pickup Hour
+
+This visualization shows how average taxi trip distance changes by pickup hour.
+
+Insight:
+
+Early morning trips show the longest average distance.
+
+4. Top Pickup Location IDs by Trip Count
+
+This visualization shows which pickup location IDs had the highest taxi activity.
+
+Insight:
+
+Pickup Location IDs such as 237, 132, 161, and 236 showed high pickup activity.
+
+Geo-Temporal Map
+
+A Kibana Maps visualization was created using the geo-enhanced dataset.
+
+Map settings:
+
+Setting	Value
+Data View	nyc_taxi_geo
+Geo Field	pickup_location
+Layer Type	Clusters
+Time Range	March 1, 2026 to March 31, 2026
+
+Map insight:
+
+Pickup activity was concentrated around Manhattan, Queens, Brooklyn, and airport-related zones.
+
+Machine Learning Regression Model
+
+A Kibana Machine Learning Data Frame Analytics regression job was created to predict taxi fare amount.
+
+Model settings:
+
+Setting	Value
+Job Type	Regression
+Source Data View	nyc_taxi_geo
+Target Field	fare_amount
+Training Percent	80%
+Destination Index	nyc_taxi_fare_prediction
+Prediction Field	fare_amount_prediction
+Top Feature Importance Values	10
+
+The total_amount field was excluded from the model because it is too closely related to fare_amount and could make the prediction artificially easy.
+
+Machine Learning Results
+
+The regression model produced the following results:
+
+Metric	Value
+Training Records	80,000
+Testing Records	20,000
+Testing R² Score	0.95
+Testing Mean Squared Error	13.6
+Training R² Score	0.945
+Training Mean Squared Error	15.2
+Testing RMSE	Approximately 3.69
+
+The testing R² score of 0.95 means the model explained about 95% of the variation in taxi fare amount on the test data.
+
+The RMSE of approximately 3.69 means the model’s fare predictions had an approximate error of $3.69 in RMSE terms.
+
+Feature Importance / Influencers
+
+The most important influencers for predicting taxi fare amount were:
+
+Feature	Role in Model
+trip_distance	Strongest influencer; longer trips usually have higher fares
+trip_duration_minutes	Second strongest influencer; longer trip duration affects fare prediction
+pickup_zone	Pickup area influences fare patterns
+dropoff_zone	Drop-off area influences fare patterns
+pickup_borough	Borough location affects fare prediction
+pickup_longitude	Helps represent pickup geography
+pickup_latitude	Helps represent pickup geography
+dropoff_longitude	Helps represent drop-off geography
+dropoff_latitude	Helps represent drop-off geography
+dropoff_borough	Borough location affects fare prediction
+
+The results show that taxi fare is strongly related to trip distance and trip duration. Location-based fields also helped the model because different taxi zones and boroughs can have different fare patterns.
+
+How to Reproduce This Project
+
+For the complete step-by-step instructions, use the full tutorial file included in this repository:
+
+CIS3200_Group6_Term_Project_Tutorial.pdf
+
+A shorter reproduction summary is included below.
+
+1. Download the Dataset
+
+Download the March 2026 Yellow Taxi Trip Records Parquet file from:
+
+https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
+
+Expected file name:
+
+yellow_tripdata_2026-03.parquet
+2. Download the Taxi Zone Shapefile
+
+Download the NYC Taxi Zone Shapefile from the same NYC TLC page and extract it into the project folder.
+
+Expected folder structure:
+
+project-folder/
+│
+├── yellow_tripdata_2026-03.parquet
+├── taxi_zones/
+│   ├── taxi_zones.shp
+│   ├── taxi_zones.dbf
+│   ├── taxi_zones.shx
+│   ├── taxi_zones.prj
+│   └── other shapefile files
+3. Install Python Libraries
+
+Run:
+
+python -m pip install pandas pyarrow geopandas
+4. Prepare the Taxi Data
+
+Run the data preparation code from this repository to create:
+
+nyc_taxi_subset.csv
+
+This script cleans the original Parquet dataset and creates a smaller CSV subset for Elasticsearch.
+
+5. Add Geo Fields
+
+Run the geo-enhancement code from this repository to create:
+
+nyc_taxi_subset_with_geo.csv
+
+This script joins the taxi trip data with the NYC Taxi Zone Shapefile and creates geographic fields for Kibana Maps.
+
+6. Upload Files to Elasticsearch
+
+Upload nyc_taxi_subset.csv into Elasticsearch as:
+
+nyc_taxi
+
+Upload nyc_taxi_subset_with_geo.csv into Elasticsearch as:
+
+nyc_taxi_geo
+
+Make sure the following fields are mapped as geo_point:
+
+pickup_location
+dropoff_location
+7. Build Kibana Visualizations
+
+Create the following visualizations in Kibana Lens:
+
+Trip Count by Pickup Hour
+Average Fare by Pickup Hour
+Average Trip Distance by Pickup Hour
+Top Pickup Location IDs by Trip Count
+8. Build Kibana Map
+
+Create a Kibana Maps cluster layer using:
+
+Data view: nyc_taxi_geo
+Geo field: pickup_location
+Layer type: Clusters
+9. Build Machine Learning Regression Job
+
+In Kibana, go to:
+
+Machine Learning → Data Frame Analytics → Create job
+
+Use these settings:
+
+Job type: Regression
+Source data view: nyc_taxi_geo
+Target field: fare_amount
+Training percent: 80%
+Destination index: nyc_taxi_fare_prediction
+Prediction field: fare_amount_prediction
+Top feature importance values: 10
+
+Do not include total_amount as an input feature because it is too closely related to fare_amount.
+
+Main Findings
+Taxi demand increases after the morning hours and peaks later in the day.
+Early morning trips have higher average fare and longer average trip distance.
+Pickup activity is concentrated around Manhattan, Queens, Brooklyn, and airport-related zones.
+The regression model predicted taxi fare amount with a testing R² score of 0.95.
+The testing RMSE was approximately $3.69.
+The strongest fare predictors were trip_distance and trip_duration_minutes.
+Project Files
+
+Recommended repository files:
+
+README.md
+prepare_taxi_data.py
+add_geo_fields.py
+CIS3200_Group6_Term_Project_Tutorial.pdf
+
+The original dataset and generated CSV files may be too large for GitHub. If they are not included in the repository, they can be recreated by following the tutorial and running the Python scripts.
+
+Authors
+Ruben Chagollan
+Edward Gallegos
+Jordy Moreno
+Giovanni Clara
+
+California State University, Los Angeles
+CIS 3200 – Data Processing and Analytics
+
+References
+NYC Taxi & Limousine Commission. TLC Trip Record Data.
+https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
+NYC Taxi Zone Shapefile / Taxi Zone Maps and Lookup Tables.
+https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
+Elasticsearch Documentation.
+https://www.elastic.co/docs
+Kibana Documentation.
+https://www.elastic.co/docs
+pandas Documentation.
+https://pandas.pydata.org/docs/
+GeoPandas Documentation.
+https://geopandas.org/
