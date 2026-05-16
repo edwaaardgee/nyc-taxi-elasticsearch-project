@@ -89,27 +89,27 @@ The project follows this general process:
 
 ```text
 Download NYC Taxi Data
-        ↓
+↓
 Download Taxi Zone Shapefile
-        ↓
+↓
 Clean and Sample Data with Python
-        ↓
+↓
 Create Time-Based Fields
-        ↓
+↓
 Join Taxi Data with Taxi Zone Shapefile
-        ↓
+↓
 Create Geo Fields for Kibana Maps
-        ↓
+↓
 Upload CSV Files into Elasticsearch
-        ↓
+↓
 Create Kibana Visualizations
-        ↓
+↓
 Build Kibana Dashboard
-        ↓
+↓
 Create Geo-Temporal Map
-        ↓
+↓
 Train Machine Learning Regression Model
-        ↓
+↓
 Evaluate Accuracy and Feature Importance
 Elasticsearch Indexes Created
 
@@ -139,6 +139,7 @@ Save a cleaned CSV subset
 Output file:
 
 nyc_taxi_subset.csv
+
 Geo-Enhanced Dataset
 
 The second Python script adds geographic fields to the taxi data by using the NYC Taxi Zone Shapefile.
@@ -159,6 +160,7 @@ Save the geo-enhanced CSV file
 Output file:
 
 nyc_taxi_subset_with_geo.csv
+
 Kibana Visualizations
 
 The project includes four main Kibana Lens visualizations.
@@ -167,33 +169,25 @@ The project includes four main Kibana Lens visualizations.
 
 This visualization shows taxi demand by hour of the day.
 
-Insight:
-
-Taxi demand increases after the morning hours and peaks later in the day.
+Insight: Taxi demand increases after the morning hours and peaks later in the day.
 
 2. Average Fare by Pickup Hour
 
 This visualization shows how average taxi fare changes by pickup hour.
 
-Insight:
-
-Average fare spikes around early morning hours.
+Insight: Average fare spikes around early morning hours.
 
 3. Average Trip Distance by Pickup Hour
 
 This visualization shows how average taxi trip distance changes by pickup hour.
 
-Insight:
-
-Early morning trips show the longest average distance.
+Insight: Early morning trips show the longest average distance.
 
 4. Top Pickup Location IDs by Trip Count
 
 This visualization shows which pickup location IDs had the highest taxi activity.
 
-Insight:
-
-Pickup Location IDs such as 237, 132, 161, and 236 showed high pickup activity.
+Insight: Pickup Location IDs such as 237, 132, 161, and 236 showed high pickup activity.
 
 Geo-Temporal Map
 
@@ -207,9 +201,7 @@ Geo Field	pickup_location
 Layer Type	Clusters
 Time Range	March 1, 2026 to March 31, 2026
 
-Map insight:
-
-Pickup activity was concentrated around Manhattan, Queens, Brooklyn, and airport-related zones.
+Map insight: Pickup activity was concentrated around Manhattan, Queens, Brooklyn, and airport-related zones.
 
 Machine Learning Regression Model
 
@@ -250,7 +242,7 @@ Feature Importance / Influencers
 The most important influencers for predicting taxi fare amount were:
 
 Feature	Role in Model
-trip_distance	Strongest influencer; longer trips usually have higher fares
+trip_distance	Strongest influencer; longer trips usually have higher fare
 trip_duration_minutes	Second strongest influencer; longer trip duration affects fare prediction
 pickup_zone	Pickup area influences fare patterns
 dropoff_zone	Drop-off area influences fare patterns
@@ -280,6 +272,7 @@ https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
 Expected file name:
 
 yellow_tripdata_2026-03.parquet
+
 2. Download the Taxi Zone Shapefile
 
 Download the NYC Taxi Zone Shapefile from the same NYC TLC page and extract it into the project folder.
